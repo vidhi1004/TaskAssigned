@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      background: linear-gradient(145deg, #e3f2fd, #f8f9fa);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar-custom {
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1055;
+    }
+
+    .navbar-custom .navbar-brand {
+      color: #f1f1f1;
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+    }
+
+    .navbar-custom .nav-link {
+      color: #e0eaff !important;
+      margin-right: 12px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .navbar-custom .nav-link:hover {
+      color: #ffffff !important;
+      text-decoration: underline;
+    }
+
+    .navbar-custom .btn-outline-light {
+      border-color: #ffffff;
+      color: #ffffff;
+    }
+
+    .navbar-custom .btn-outline-light:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    #sidebarToggle {
+      position: fixed;
+      top: 70px;
+      left: 10px;
+      z-index: 1050;
+      background-color: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: opacity 0.3s ease;
+    }
+
+    #sidebar.show + #sidebarToggle {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      height: calc(100% - 70px);
+      width: 250px;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+      z-index: 1040;
+      overflow-y: auto;
+    }
+
+    #sidebar.hide {
+      transform: translateX(-100%);
+    }
+
+    .content {
+      margin-left: 250px;
+      padding: 100px 30px 30px 30px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .sidebar a {
+      color: #e0eaff;
+      display: block;
+      padding: 15px 25px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease, background 0.3s ease;
+    }
+
+    .sidebar a:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .card h2 {
+      font-weight: 600;
+      color: #2e3a59;
+      margin-bottom: 20px;
+    }
+
+    .form-control {
+      border-radius: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
+    .btn-danger {
+      background-color: #e74c3c;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg vh-10 navbar-custom py-3">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Admin Dashboard</a>
+    <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#ffffff" class="bi bi-list" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M2.5 12.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1h-10a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1h-10a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1h-10a.5.5 0 0 1-.5-.5z"/>
+      </svg>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showSection('createjobs')">Jobs</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showSection('candidates')">Candidates</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showSection('jobs')">Job List</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showSection('createskills')">Skills</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-outline-light" onclick="logout()">Log Out</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<button id="sidebarToggle">☰</button>
+
+
+<div class="sidebar" id="sidebar">
+  <a href="#" onclick="showSection('createjobs')">📋 Create Jobs</a>
+  <a href="#" onclick="showSection('candidates')">👥 Candidates</a>
+  <a href="#" onclick="showSection('jobs')">📅 Job List</a>
+  <a href="#" onclick="showSection('createskills')">🎯 Skills Creation</a>
+  <a href="#" onclick="logout()">🚪 Logout</a>
+</div>
+
+<div class="content">
+     
+ 
+  <div id="section-createjobs">
+    <h2>Jobs</h2>
+    <form id="job-form" class="card">
+      <input type="text" placeholder="Job Title" name="title" class="form-control mb-2" required>
+      <textarea placeholder="Description" name="description" class="form-control mb-2" required></textarea>
+      <label for="skills-select">Required Skills</label>
+      <select name="required_skills" class="form-control mb-2" id="skills-select" multiple required></select>
+      <input type="text" placeholder="Posted By" name="posted_by" class="form-control mb-2" required>
+      <button class="btn btn-primary" type="submit">Create Job</button>
+    </form>
+</div>
+    <div id="section-jobs">
+    <h2>Job List</h2>
+    <ul class="list-group" id="job-list"></ul>
+  </div>
+
+ 
+  <div id="section-candidates" style="display:none">
+    <h2>Candidates</h2>
+    <ul class="list-group" id="candidate-list"></ul>
+  </div>
+
+   <div id="section-createskills">
+    <h2>Skills Creation</h2>
+    <form id="skills-form" class="card">
+      <input type="text" placeholder="Skills Name" name="name" class="form-control mb-2" required>
+      <button class="btn btn-primary" type="submit">Create Skill</button>
+    </form>
+  </div>
+<script>
+const access = localStorage.getItem("access_token");
+
+
+axios.get("http://127.0.0.1:8000/is_admin/", {
+  headers: {
+    Authorization: "Bearer " + access
+  }
+})
+.then(res => {
+  if (!res.data.is_admin) {
+    alert(" Not Authorized. Redirecting...");
+    window.location.href = "/admin_login/";
+  }
+})
+.catch(err => {
+  console.error("Admin check failed:", err);
+  window.location.href = "/admin_login/";
+});
+
+axios.defaults.headers.common["Authorization"] = "Bearer " + access;
+
+function showSection(id) {
+  document.querySelectorAll('.content > div').forEach(div => div.style.display = 'none');
+  document.getElementById(`section-${id}`).style.display = 'block';
+}
+
+function loadSkills() {
+  axios.get("/api/skills/").then(res => {
+    const select = document.getElementById("skills-select");
+    res.data.forEach(skill => {
+      const option = document.createElement("option");
+      option.value = skill.id;
+      option.textContent = skill.name;
+      select.appendChild(option);
+    });
+  });
+}
+
+
+function loadJobs() {
+  axios.get("/api/job_view/").then(res => {
+    const list = document.getElementById("job-list");
+    list.innerHTML = "";
+    res.data.payload.forEach(job => {
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+      li.innerHTML = `
+        <strong>${job.title}</strong><br>
+        ${job.description}<br>
+        Skills: ${job.required_skills.map(s => s.name).join(', ')}
+        <button class="btn btn-danger btn-sm mt-2" onclick="deleteJob(${job.id})">Delete</button>
+      `;
+      list.appendChild(li);
+    });
+  });
+}
+const skillForm = document.getElementById("skills-form");
+skillForm.addEventListener("submit", e => {
+  e.preventDefault();
+  const name = skillForm.name.value;
+  axios.post("/api/skills_creation", { name })
+    .then(() => { skillForm.reset();loadSkills(); })
+    .catch(err => console.error(err));
+});
+
+
+
+const jobForm = document.getElementById("job-form");
+jobForm.addEventListener("submit", e => {
+  e.preventDefault();
+  const title = jobForm.title.value;
+  const description = jobForm.description.value;
+  const selected = Array.from(document.getElementById("skills-select").selectedOptions).map(opt => parseInt(opt.value));
+  const posted_by = jobForm.posted_by.value;
+  axios.post("/api/job/", { title, description, required_skills: selected, posted_by })
+    .then(() => { jobForm.reset(); loadJobs(); })
+    .catch(err => console.error(err));
+});
+
+
+function loadCandidates() {
+  axios.get("/profile_all/").then(res => {
+    const list = document.getElementById("candidate-list");
+    list.innerHTML = "";
+    res.data.forEach(user => {
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+      li.innerHTML = `
+        <strong>Username:</strong>${user.username}<br>
+        <strong>Email:</strong>${user.email}<br>
+        <strong>Skills:</strong> ${user.skills.map(s => s.name).join(', ')}<br>
+        <strong>Phone Number:</strong>${user.phone_number}<br>
+        <strong>Resume File:</strong> 
+          ${user.resume_file ? `<a href="${user.resume_file}" target="_blank">Download</a>` : " Not uploaded"}<br>
+      `;
+      list.appendChild(li);
+    });
+  });
+}
+function deleteJob(id) {
+  if (confirm("Are you sure to delete this job?")) {
+    axios.delete(`/api/job/${id}/`)
+      .then(() => {
+        alert(" Job deleted");
+        loadJobs();
+      })
+      .catch(err => console.error(err));
+  }
+}
+function logout(){
+        localStorage.removeItem("access_token")
+        localStorage.removeItem("refresh_token")
+        window.location.href="/admin_login/"
+    }
+
+loadSkills();
+loadJobs();
+loadCandidates();
+
+const toggleBtn = document.getElementById("sidebarToggle");
+  const sidebar = document.getElementById("sidebar");
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("hide");
+    toggleBtn.style.display = sidebar.classList.contains("hide") ? "block" : "none";
+  });
+
+</script>
+</body>
+</html>
+

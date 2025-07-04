@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333; }
+    .job { border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 10px; background-color: #fff; }
+    h2 { color: #1a73e8; }
+  </style>
+</head>
+<body>
+  <h2>Hello {{ user.first_name }},</h2>
+  <p>Here are your matched jobs for this week:</p>
+
+  {% for match in matched_jobs %}
+    <div class="job">
+      <strong>{{ match.job.title }}</strong><br>
+      Match: {{ match.match_percentage|floatformat:2 }}%<br>
+      {{ match.job.description }}
+    </div>
+  {% endfor %}
+
+  <p>Good luck!<br>– JobMatcher Team</p>
+</body>
+</html>

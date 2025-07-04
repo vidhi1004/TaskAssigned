@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(145deg, #e3f2fd, #f8f9fa);
+      font-family: 'Inter', sans-serif;
+    }
+    .container {
+      max-width: 700px;
+      margin-top: 60px;
+    }
+    .card {
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+      background: #ffffff;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    label {
+      font-weight: 500;
+      margin-top: 10px;
+    }
+    input, textarea, select {
+      border-radius: 10px !important;
+    }
+    button {
+      border-radius: 10px;
+    }
+    .navbar-custom {
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    .navbar-custom .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #ffffff;
+    }
+    .navbar-custom .nav-link {
+      color: #e0eaff !important;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .navbar-custom .nav-link:hover {
+      color: #ffffff !important;
+      text-decoration: underline;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    pre {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .job-item {
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg vh-10 navbar-custom py-3">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/home/">JobMatcher</a>
+      <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        ☰
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/home/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card mt-4">
+      <h2>User Profile</h2>
+      <ul id="profile-list"></ul>
+    </div>
+
+    <div class="card">
+      <h2 class="mb-3">Matched Jobs</h2>
+      <ul id="matched-jobs-list"></ul>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      window.location.href = '/login/';
+    }
+    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+
+    axios.get("http://127.0.0.1:8000/api/profile/")
+      .then(response => {
+        const profile = response.data;
+        const list = document.getElementById("profile-list");
+
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>Username:</strong> ${profile.username}<br>
+          <strong>Email:</strong> ${profile.email}<br>
+          <strong>Phone Number:</strong> ${profile.phone_number}<br>
+          <strong>Resume:</strong> <a href="${profile.resume_file}" target="_blank">${profile.resume_file}</a><br>
+          <strong>Resume Content:</strong><br><pre>${profile.resume_content}</pre><br>
+          <strong>Skills:</strong> ${profile.skills.map(s => s.name).join(", ")}<br>
+        `;
+        list.appendChild(li);
+      })
+      .catch(error => {
+        console.error("Error loading profile:", error);
+      });
+
+    axios.get("http://127.0.0.1:8000/api/job_match/")
+      .then(response => {
+        const jobs = response.data.payload;
+        const list = document.getElementById("matched-jobs-list");
+
+        if (!jobs || jobs.length === 0) {
+          list.innerHTML = "<li>No matched jobs found.</li>";
+          return;
+        }
+
+        jobs.forEach(job => {
+          const li = document.createElement("li");
+          li.classList.add("job-item");
+          li.innerHTML = `
+            <strong>Job Title:</strong> ${job.job.title}<br>
+            <strong>Job's Required skills:</strong> ${job.job.required_skills.map(s=>s.name).join(', ')}<br>
+            <strong>Match Percentage:</strong> ${job.match_percentage.toFixed(2)}%
+          `;
+          list.appendChild(li);
+        });
+      })
+      .catch(error => {
+        console.error("Error loading matched jobs:", error);
+      });
+
+    function logout() {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      window.location.href = "/login/";
+    }
+  </script>
+</body>
+</html>
