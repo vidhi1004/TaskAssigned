@@ -4,9 +4,11 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from parser_and_job_matcherapp.models import Users, MatchedJob
 
+
 @shared_task
 def send_weekly_job_match_emails():
-    users = Users.objects.filter(is_active=True).exclude(resume_content__isnull=True).exclude(resume_content="")
+    users = Users.objects.filter(is_active=True).exclude(
+        resume_content__isnull=True).exclude(resume_content="")
 
     for user in users:
         matched_jobs = MatchedJob.objects.filter(candidate=user)
@@ -27,4 +29,3 @@ def send_weekly_job_match_emails():
             )
             email.content_subtype = 'html'
             email.send()
-    

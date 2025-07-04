@@ -10,10 +10,11 @@ class SkillsSerializer(serializers.ModelSerializer):
 
 class UserRegisterationSerializer(serializers.ModelSerializer):
     password_conformation = serializers.CharField(write_only=True)
+
     class Meta:
         model = Users
         fields = ['username', 'email', 'first_name',
-                  'last_name', 'password', 'phone_number','password_conformation']
+                  'last_name', 'password', 'phone_number', 'password_conformation']
 
     def validate(self, data):
         password = data.get('password')
@@ -25,7 +26,6 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"password": "Password must be at least 8 characters long."})
 
-       
         if data['password'] != data['password_conformation']:
             raise serializers.ValidationError("Passwords must match")
         return data
