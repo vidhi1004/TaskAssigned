@@ -263,7 +263,7 @@
 <script>
   const token = localStorage.getItem("access_token")
   if (!token) {
-    window.location.href = "/login1/";
+    window.location.href = "/login/";
   }
   axios.defaults.headers.common['Authorization'] = token;
 

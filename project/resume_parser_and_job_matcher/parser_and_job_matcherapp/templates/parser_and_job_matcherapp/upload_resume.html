@@ -102,11 +102,17 @@
   <script>
     document.getElementById("upload-form").addEventListener("submit", function (e) {
       e.preventDefault();
+
+      token=localStorage.getItem("access_token");
+      axios.defaults.headers.common['Authorization']="Bearer "+token;
+
       const formData = new FormData();
       const fileInput = document.getElementById("resume");
       formData.append("resume", fileInput.files[0]);
 
-      axios.post("http://127.0.0.1:8000/api/upload_resume/", formData, {
+      
+
+      axios.post("http://127.0.0.1:8000/api/resume/", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

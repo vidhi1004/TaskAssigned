@@ -15,6 +15,7 @@ from django.template.loader import render_to_string
 import docx2txt
 import pymupdf
 from rest_framework import status
+import re
 
 
 class CandidateRegistrationView(APIView):
@@ -94,7 +95,7 @@ class LoginView(APIView):
         if user and user.check_password(password):
             refresh = RefreshToken.for_user(user)
             return Response({"status": 200, "refresh_token": str(refresh), "access_token": str(refresh.access_token)}, status=status.HTTP_202_ACCEPTED)
-        return Response({"error": "something is"})
+        return Response({"error": "something is wrong"})
 
 
 class JobManagementView(APIView):
@@ -152,8 +153,13 @@ class UploadResumeView(APIView):
         skill = []
         all_skills = Skills.objects.all()
         resume_text = content.lower()
+        
+
+        resume_text = resume_text.lower()
+
         for s in all_skills:
-            if s.name.lower() in resume_text:
+            pattern = r'\b' + re.escape(s.name.lower()) + r'\b'
+            if re.search(pattern, resume_text):
                 skill.append(s)
 
         user = request.user

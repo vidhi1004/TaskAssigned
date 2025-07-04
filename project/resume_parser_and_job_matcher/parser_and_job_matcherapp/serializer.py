@@ -7,7 +7,6 @@ class SkillsSerializer(serializers.ModelSerializer):
         model = Skills
         fields = ['id', 'name']
 
-
 class UserRegisterationSerializer(serializers.ModelSerializer):
     password_conformation = serializers.CharField(write_only=True)
 
