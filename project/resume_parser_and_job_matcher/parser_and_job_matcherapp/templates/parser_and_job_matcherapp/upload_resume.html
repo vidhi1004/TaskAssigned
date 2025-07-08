@@ -76,7 +76,7 @@
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="/job_list/">Jobs</a></li>
           <li class="nav-item"><a class="nav-link" href="/profile/">Profile</a></li>
-          <li class="nav-item"><a class="nav-link" href="/login/">Logout</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="logout()">Logout</a></li>
         </ul>
       </div>
     </div>
@@ -85,7 +85,7 @@
   <div class="container">
     <div class="card mt-4">
       <h3 class="text-center mb-4">Upload Your Resume</h3>
-      <form id="upload-form" enctype="multipart/form-data">
+      <form id="upload-form" enctype="multipart/form-data" method="post">
         <div class="mb-3">
           <label for="resume">Select Resume File</label>
           <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
@@ -100,31 +100,41 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
+    const token=localStorage.getItem("access_token");
+      if (!token) {
+       alert("You are not logged in")
+       window.location.href = '/login/';
+      }
     document.getElementById("upload-form").addEventListener("submit", function (e) {
       e.preventDefault();
+      
+    axios.defaults.headers.common['Authorization']="Bearer "+ token;
 
-      token=localStorage.getItem("access_token");
-      axios.defaults.headers.common['Authorization']="Bearer "+token;
-
-      const formData = new FormData();
-      const fileInput = document.getElementById("resume");
-      formData.append("resume", fileInput.files[0]);
+    const formData = new FormData();
+    const fileInput = document.getElementById("resume");
+    formData.append("resume", fileInput.files[0]);
 
       
 
-      axios.post("http://127.0.0.1:8000/api/resume/", formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      .then(res => {
-        document.getElementById("upload-result").innerText = "Upload successful!";
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("upload-result").innerText = "Upload failed.";
-      });
+    axios.post("http://127.0.0.1:8000/api/resume/", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    .then(res => {
+      document.getElementById("upload-result").innerText = "Upload successful!";
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("upload-result").innerText = "Upload failed.";
     });
-  </script>
+  });
+
+  function logout(){
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    window.location.href="/login/";
+  }
+</script>
 </body>
 </html>
