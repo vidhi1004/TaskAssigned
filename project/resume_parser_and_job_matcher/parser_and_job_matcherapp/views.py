@@ -124,6 +124,18 @@ class JobManagementView(APIView):
             return Response({"message": "Deleted"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": e}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self, request):
+        try:
+            job_id = request.data.get("id")
+            job = Job.objects.get(id=job_id)
+            serializer = JobManagementSerializer(job, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Job updated successfully"})
+            return Response({"error": serializer.errors}, status=400)
+        except Job.DoesNotExist:
+            return Response({"error": "Job not found"}, status=404)
 
 
 class UploadResumeView(APIView):
@@ -167,6 +179,7 @@ class UploadResumeView(APIView):
         user.resume_content = content
         user.save()
         user.skills.set(skill)
+        MatchedJob.objects.filter(candidate=user).delete()
         match_jobs_for_user(user)
         return Response({"message": "resume uploaded successfully and job matched"}, status=status.HTTP_200_OK)
 
